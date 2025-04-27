@@ -176,3 +176,16 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')  # pulled from Render env vars
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  # pulled from Render env vars
+
+# Production security settings
+DEBUG = False  # VERY IMPORTANT!
+
+SECURE_HSTS_SECONDS = 31536000  # 1 year in seconds
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+SECURE_SSL_REDIRECT = True
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
