@@ -174,5 +174,5 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587  # Use 465 for SSL/TLS
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-EMAIL_HOST_USER = 'upworkstud198@gmail.com'  # Replace with your email
-EMAIL_HOST_PASSWORD = 'meufzuxveyotnzpl'  # Replace with your email password or use environment variables
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')  # pulled from Render env vars
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  # pulled from Render env vars
