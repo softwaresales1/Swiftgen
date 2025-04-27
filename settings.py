@@ -92,6 +92,10 @@ WSGI_APPLICATION = 'Work.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
+DATABASE_URL = os.getenv('DATABASE_URL', 'postgres://admin:Falcon85h#@stfdb.onrender.com:5432/STFDB')
+
+# Parse the DATABASE_URL
+url = urlparse(DATABASE_URL)
 
 DATABASES = {
     'default': {
