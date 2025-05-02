@@ -92,6 +92,10 @@ WSGI_APPLICATION = 'Work.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
+DATABASE_URL = os.getenv('DATABASE_URL', 'postgres://admin:Falcon85h#@stfdb.onrender.com:5432/STFDB')
+
+# Parse the DATABASE_URL
+url = urlparse(DATABASE_URL)
 
 DATABASES = {
     'default': {
@@ -170,5 +174,18 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587  # Use 465 for SSL/TLS
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-EMAIL_HOST_USER = 'upworkstud198@gmail.com'  # Replace with your email
-EMAIL_HOST_PASSWORD = 'meufzuxveyotnzpl'  # Replace with your email password or use environment variables
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')  # pulled from Render env vars
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  # pulled from Render env vars
+
+# Production security settings
+DEBUG = False  # VERY IMPORTANT!
+
+SECURE_HSTS_SECONDS = 31536000  # 1 year in seconds
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+SECURE_SSL_REDIRECT = True
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
