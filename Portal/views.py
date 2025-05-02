@@ -29,6 +29,10 @@ from django.template.loader import render_to_string
 from .models import Skill, CommunicationLanguage, CustomUser, UsersSkill, UsersCommunicationLanguage
 from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
+from django.db import transaction
+from django.contrib import messages
+import logging
+
 import os
 
 from django.core.mail import EmailMessage
@@ -149,41 +153,75 @@ def send_simple_message(reciever,subject,text):
 
 
 def send_signup_email(user_email, first_name, request):
-    # Define your platform name and support email
-    platform_name = ' Swift Talent Forge'
-    support_email = 'support@swiftgen.com'
+    """Send welcome email to newly registered users with error handling and timeout."""
+    try:
+        # Define your platform name and support email
+        platform_name = 'Swift Talent Forge'
+        support_email = 'support@swiftgen.com'
 
-    # Read email content from file
-    with open(os.path.join('Portal/', 'welcome_email.txt'), 'r') as file:
-        message_template = file.read()
+        try:
+            # Read email content from file
+            with open(os.path.join('Portal/', 'welcome_email.txt'), 'r') as file:
+                message_template = file.read()
+        except FileNotFoundError:
+            # Fallback message if template file is not found
+            message_template = """
+            Welcome to {platform_name}!
+            
+            Hi {first_name},
+            
+            Thank you for joining {platform_name}. Your account has been successfully created.
+            
+            Get started by visiting your dashboard: {dashboard_url}
+            
+            If you need assistance, contact us at {support_email}
+            
+            Best regards,
+            The {platform_name} Team
+            """
 
-    # Create the dashboard link
-    dashboard_url = request.build_absolute_uri(reverse('Portal:home'))
+        # Create the dashboard link
+        dashboard_url = request.build_absolute_uri(reverse('Portal:home'))
 
-    # Personalize the email content
-    message = message_template.format(
-        first_name=first_name, 
-        platform_name=platform_name, 
-        support_email=support_email, 
-        dashboard_url=dashboard_url
-    )
+        # Personalize the email content
+        message = message_template.format(
+            first_name=first_name,
+            platform_name=platform_name,
+            support_email=support_email,
+            dashboard_url=dashboard_url
+        )
 
-    # Define the email subject
-    subject = f'Account Creation Success on {platform_name}'
+        # Define the email subject
+        subject = f'Account Creation Success on {platform_name}'
 
-    # Create the email message
-    email = EmailMessage(subject, message, to=[user_email])
+        # Create the email message
+        email = EmailMessage(
+            subject=subject,
+            body=message,
+            from_email=settings.EMAIL_HOST_USER,
+            to=[user_email]
+        )
 
-    # Attach an image
-    image_path = os.path.join('static/assets/img/', 'DER.jpeg')
-    with open(image_path, 'rb') as image:
-        email.attach('your_image.png', image.read(), 'image/png')
+        try:
+            # Attach an image
+            image_path = os.path.join('static/assets/img/', 'DER.jpeg')
+            with open(image_path, 'rb') as image:
+                email.attach('your_image.png', image.read(), 'image/png')
+        except FileNotFoundError:
+            # Log warning if image not found but continue sending email
+            print(f"Warning: Welcome email image not found at {image_path}")
 
-    # Send the email
-    email.send()
+        # Send the email with timeout
+        email.send(fail_silently=False, timeout=5)
+        return True
 
+    except Exception as e:
+        # Log the error but don't stop the signup process
+        print(f"Failed to send welcome email to {user_email}: {str(e)}")
+        return False
 
 def signup_user(request):
+    """Handle user registration with proper validation and error handling."""
     context = dict()
     skill_list = Skill.objects.all()
     language_list = CommunicationLanguage.objects.all()
@@ -191,57 +229,116 @@ def signup_user(request):
     context['language_list'] = language_list
 
     if request.method == 'POST':
-        username = request.POST['name']
-        first_name = request.POST['fname']
-        last_name = request.POST['lname']
-        email = request.POST['email']
-        password1= request.POST['passwd1']
-        if email.endswith('@gmail.com'):
-            password1 = password1
-        else:
+        try:
+            # Validate required fields
+            required_fields = ['name', 'fname', 'lname', 'email', 'passwd1', 'phno', 'bio', 'batch', 'gender']
+            for field in required_fields:
+                if not request.POST.get(field):
+                    raise ValueError(f"{field.replace('_', ' ').title()} is required")
+
+            # Get form data
+            username = request.POST['name']
+            first_name = request.POST['fname']
+            last_name = request.POST['lname']
+            email = request.POST['email']
             password1 = request.POST['passwd1']
-        phone_number = request.POST['phno']
-        bio = request.POST['bio']
-        image = request.FILES['image']
-        batchYear = request.POST['batch']
-        gender = request.POST['gender']
-        skills = request.POST.getlist('skills[]')
-        languages = request.POST.getlist('languages[]')
+            phone_number = request.POST['phno']
+            bio = request.POST['bio']
+            batchYear = request.POST['batch']
+            gender = request.POST['gender']
 
-        # Create the User object
-        user = User.objects.create_user(username=username, first_name=first_name, last_name=last_name, email=email, password=password1)
+            # Validate image
+            if 'image' not in request.FILES:
+                raise ValueError("Profile image is required")
+            image = request.FILES['image']
 
-        # Create the CustomUser object
-        cuser = CustomUser(user=user, phone_number=phone_number, image=image, bio=bio, batchYear=batchYear, gender=gender)
+            # Validate skills and languages
+            skills = request.POST.getlist('skills[]')
+            languages = request.POST.getlist('languages[]')
+            if not skills:
+                raise ValueError("Please select at least one skill")
+            if not languages:
+                raise ValueError("Please select at least one language")
 
-        # Save both objects
-        user.save()
-        cuser.save()
+            # Check if username or email already exists
+            if User.objects.filter(username=username).exists():
+                raise ValueError("Username already exists")
+            if User.objects.filter(email=email).exists():
+                raise ValueError("Email already exists")
 
-        # Save user skills
-        for uskill in skills:
-            skill = Skill.objects.get(skill_name=uskill)
-            cuskill = UsersSkill(skill=skill, user=cuser, level_of_proficiency=int(request.POST[skill.skill_name]))
-            cuskill.save()
+            # Create the User object with transaction
+            with transaction.atomic():
+                # Create User
+                user = User.objects.create_user(
+                    username=username,
+                    first_name=first_name,
+                    last_name=last_name,
+                    email=email,
+                    password=password1
+                )
 
-        # Save user languages
-        for ulanguage in languages:
-            language = CommunicationLanguage.objects.get(language_name=ulanguage)
-            culanguage = UsersCommunicationLanguage(language=language, user=cuser, level_of_fluency=int(request.POST[language.language_name]))
-            culanguage.save()
+                # Create CustomUser
+                cuser = CustomUser(
+                    user=user,
+                    phone_number=phone_number,
+                    image=image,
+                    bio=bio,
+                    batchYear=batchYear,
+                    gender=gender
+                )
+                cuser.save()
 
-        # Log the user in
-        login(request, user)
+                # Save user skills
+                for uskill in skills:
+                    skill = Skill.objects.get(skill_name=uskill)
+                    proficiency = request.POST.get(skill.skill_name)
+                    if not proficiency:
+                        raise ValueError(f"Proficiency level required for {skill.skill_name}")
+                    UsersSkill.objects.create(
+                        skill=skill,
+                        user=cuser,
+                        level_of_proficiency=int(proficiency)
+                    )
 
-        # Send a success email to the user
-        send_signup_email(email, first_name, request)
+                # Save user languages
+                for ulanguage in languages:
+                    language = CommunicationLanguage.objects.get(language_name=ulanguage)
+                    fluency = request.POST.get(language.language_name)
+                    if not fluency:
+                        raise ValueError(f"Fluency level required for {language.language_name}")
+                    UsersCommunicationLanguage.objects.create(
+                        language=language,
+                        user=cuser,
+                        level_of_fluency=int(fluency)
+                    )
 
-        # Redirect to the home page
-        return HttpResponseRedirect(reverse("Portal:home"))
+            # Log the user in
+            login(request, user)
 
-    # If not POST request, render the signup page with context
+            # Try to send welcome email
+            try:
+                send_signup_email(email, first_name, request)
+            except Exception as e:
+                logger.error(f"Failed to send welcome email to {email}: {str(e)}")
+                messages.warning(request, "Account created successfully, but welcome email could not be sent.")
+            else:
+                messages.success(request, f"Welcome {first_name}! Your account has been created successfully.")
+
+            return HttpResponseRedirect(reverse("Portal:home"))
+
+        except ValueError as e:
+            messages.error(request, str(e))
+            context['error_message'] = str(e)
+        except Exception as e:
+            logger.error(f"Signup error: {str(e)}")
+            messages.error(request, "An error occurred during signup. Please try again.")
+            context['error_message'] = "An unexpected error occurred. Please try again."
+
+        # If there was an error, return to signup page with context
+        return render(request, 'signup.html', context)
+
+    # GET request
     return render(request, 'signup.html', context)
-
 
 def recommended_jobs(cuser):
     jobs_recommended = list()
@@ -347,35 +444,59 @@ class LoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
 def login_user(request):
+    """Handle user login with proper validation and feedback."""
     context = {}
+    
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             
-            logger.debug(f"Attempting to authenticate user: {username}")
-            user = authenticate(request, username=username, password=password)
-            
-            if user is not None:
-                logger.debug(f"Authentication successful for user: {username}")
-                login(request, user)
-                if request.COOKIES.get('post_project'):
-                    logger.debug("Redirecting to form state with id=2")
-                    return form_state(request, id=2)
+            try:
+                # Attempt to authenticate user
+                logger.debug(f"Attempting to authenticate user: {username}")
+                user = authenticate(request, username=username, password=password)
+                
+                if user is not None:
+                    # Successful login
+                    logger.debug(f"Authentication successful for user: {username}")
+                    login(request, user)
+                    messages.success(request, f"Welcome back, {user.first_name}!")
+                    
+                    # Check if there's a pending project post
+                    if request.COOKIES.get('post_project'):
+                        logger.debug("Redirecting to form state with id=2")
+                        return form_state(request, id=2)
+                    else:
+                        logger.debug("Redirecting to home")
+                        return HttpResponseRedirect(reverse('Portal:home'))
                 else:
-                    logger.debug("Redirecting to home")
-                    return HttpResponseRedirect(reverse('Portal:home'))
-            else:
-                logger.warning(f"Authentication failed for user: {username}")
-                context['error_message'] = 'Username or password is incorrect'
-                if request.COOKIES.get('post_project'):
-                    context['post_project'] = 'post_project'
+                    # Failed login
+                    logger.warning(f"Authentication failed for user: {username}")
+                    messages.error(request, 'Invalid username or password.')
+                    context['error_message'] = 'Username or password is incorrect'
+                    
+                    if request.COOKIES.get('post_project'):
+                        context['post_project'] = 'post_project'
+            
+            except Exception as e:
+                # Handle unexpected errors
+                logger.error(f"Login error for user {username}: {str(e)}")
+                messages.error(request, 'An error occurred during login. Please try again.')
+                context['error_message'] = 'An unexpected error occurred'
+        
         else:
+            # Form validation failed
             logger.warning("Login form is invalid")
+            messages.error(request, 'Please correct the form errors.')
+            context['error_message'] = 'Invalid form submission'
+    
     else:
+        # GET request - show empty form
         form = LoginForm()
 
+    # Add form to context and render
     context['form'] = form
     return render(request, 'login.html', context)
 # services 
