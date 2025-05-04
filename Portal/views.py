@@ -1024,20 +1024,4 @@ class ProjectForm(forms.ModelForm):
             'deadline': forms.DateInput(attrs={'type': 'date'}),
         }
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .forms import ProjectForm
 
-@login_required
-def post_project(request):
-    if request.method == 'POST':
-        form = ProjectForm(request.POST, request.FILES)
-        if form.is_valid():
-            project = form.save(commit=False)
-            project.user = request.user
-            project.save()
-            return redirect('Portal:browse_jobs')  # or another success page
-    else:
-        form = ProjectForm()
-    
-    return render(request, 'post_project.html', {'form': form})
