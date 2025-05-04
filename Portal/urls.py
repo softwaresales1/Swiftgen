@@ -5,6 +5,7 @@ app_name = 'Portal'
 urlpatterns = [
     path('', views.index, name='index'),
     path('signup/', views.signup_user, name='signup'),
+    path('post_project/', views.post_project, name='post_project'),
     path('get_started/', views.get_started, name='get_started'),
     path('services/', views.services, name='services'),
     path('contactus/', views.contactus, name='contactus'),
