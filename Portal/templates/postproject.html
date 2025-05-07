@@ -1,177 +1,218 @@
 <!DOCTYPE html>
 <html data-wf-page="588650ddefcbe214061d3bfe" data-wf-site="5862ff0a48ddaea33e96e0ef">
 
+
 <head>
-  <title>Post Project</title>
-  <meta charset="utf-8" />
-  <meta content="width=device-width, initial-scale=1" name="viewport" />
-  <meta content="Webflow" name="generator" />
-  <link href="https://daks2k3a4ib2z.cloudfront.net/5862ff0a48ddaea33e96e0ef/css/freelancer-cms.webflow.f510b9bc8.css" rel="stylesheet" type="text/css" />
-  <style>
+    <title>Post Project</title>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <meta content="Webflow" name="generator" />
+    <link href="https://daks2k3a4ib2z.cloudfront.net/5862ff0a48ddaea33e96e0ef/css/freelancer-cms.webflow.f510b9bc8.css" rel="stylesheet"
+        type="text/css" />
+    
+     
+</head>
+<style>
     body {
-      background-image: linear-gradient(to bottom, #092366, #092366 85%, white 15%, white);
-      background-size: cover;
-      background-repeat: no-repeat;
-      font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+        background-image: linear-gradient(to bottom, #092366, #092366 85%, white 15%, white);
+        background-size: cover;
+        background-repeat: no-repeat;
+        font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
 
+
+
     .d1 {
-      position: absolute;
-      top: 25%;
-      left: 20%;
-      right: 20%;
-      color: white;
-      z-index: 15;
+        position: absolute;
+        top: 25%;
+        left: 20%;
+        right: 20%;
+        color: white;
+        z-index: 15;
     }
 
     .white {
-      color: white;
-      z-index: 15;
+        color: white;
+
+        z-index: 15;
     }
 
     .d2 {
-      background-color: white;
-      color: black;
-      width: 100%;
-      padding: 25px;
-      border: 0.1px solid #E8E8E8;
-      font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
-      border-radius: 0.5em;
+        background-color: white;
+        color: black;
+        width: 100%;
+        padding: 25px;
+        border-style: solid;
+        border-width: 0.1px;
+        border-color: #E8E8E8;
+        font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+
     }
 
-    input[type=text],
-    input[type=number],
-    input[type=date],
-    textarea,
-    select {
-      padding: 12px 20px;
-      font-size: 18px;
-      color: #606060;
-      width: 100%;
-      border: 1px solid #E8E8E8;
-      border-radius: 0.3em;
-      font-family: inherit;
-      margin-top: 5px;
+    input[type=text] {
+        padding: 12px 20px;
+        font-size: 20px;
+        color: #606060;
+        width: 100%;
+        border-width: 1px;
+        border-color: #E8E8E8;
+        border-radius: .3em;
+        font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    .in:active,
+    .in:focus {
+        border-width: 1.5px;
+        border-color: blue;
+        /* here configure as your needs */
     }
 
     textarea {
-      height: 150px;
-      resize: vertical;
+        padding: 12px 20px;
+        font-size: 20px;
+        color: #606060;
+        width: 100%;
+        border-width: 1px;
+        border-color: #E8E8E8;
+        height: 200px;
+        border-radius: .3em;
+        font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
 
-    input[type=file] {
-      font-size: 16px;
-      margin-top: 10px;
+    .txt:active,
+    .txt:focus {
+        border-width: 1.5px;
+        border-color: blue;
+        /* here configure as your needs */
     }
+
+    .ddl {
+        padding: 12px 20px;
+        font-size: 20px;
+        color: #606060;
+        width: 100%;
+        border-width: 1px;
+        border-color: #E8E8E8;
+        border-radius: .3em;
+        font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    .ddl:active,
+    .ddl:focus {
+        border-width: 1.5px;
+        border-color: blue;
+        /* here configure as your needs */
+    }
+
 
     input[type=submit] {
-      margin-top: 20px;
-      padding: 12px 20px;
-      font-size: 16px;
-      background-color: #092366;
-      color: white;
-      border: none;
-      border-radius: 0.3em;
-      cursor: pointer;
+        padding: 12px 20px;
+        font-size: 14px;
+        color: #606060;
+        border-width: 1px;
+        border-color: #E8E8E8;
+        border-radius: .3em;
+        font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
+</style>
 
-    input[type=submit]:hover {
-      background-color: #0b2e7a;
-    }
-
-    label {
-      display: block;
-      margin-top: 20px;
-      font-weight: bold;
-      color: black;
-    }
-
-    h3 {
-      margin-bottom: 5px;
-      font-weight: normal;
-    }
-  </style>
-</head>
-
-<body>
-  <div data-collapse="medium" data-animation="default" data-duration="400" class="navbar w-nav">
-    <div class="content-wrapper w-container">
-      <nav class="nav-menu w-nav-menu">
-        <a href="{% url 'Portal:browse_jobs' %}" class="navlink w-inline-block">Browse Jobs</a>
-        {% if not request.user.is_authenticated %}
-        <a href="{% url 'Portal:login' %}" class="navlink w-inline-block">Login</a>
-        <a href="{% url 'Portal:signup' %}" class="navlink w-inline-block">SignUp</a>
-        {% endif %}
-      </nav>
-      <div class="menu-button w-nav-button">
-        <div class="burger-menu w-icon-nav-menu"></div>
-      </div>
+<body data-ix="full-opacity-on-load" class="body">
+    <div data-collapse="medium" data-animation="default" data-duration="400" class="navbar w-nav">
+         
+        <div class="content-wrapper w-container">
+             
+            <nav class="nav-menu w-nav-menu">
+                <a href="{% url 'Portal:browse_jobs' %}" data-ix="move-to-origin-on-hover" class="navlink w-inline-block">
+                    <div>Browse Jobs</div>
+                    <div data-ix="move-left-100-percent" class="hover-line"></div>
+                </a>
+                {% if not request.user.is_authenticated %}
+                <a href="{% url 'Portal:login' %}" data-ix="move-to-origin-on-hover" class="navlink w-inline-block">
+                    <div>Login</div>
+                    <div data-ix="move-left-100-percent" class="hover-line"></div>
+                </a>
+                <a href="{% url 'Portal:signup' %}" data-ix="move-to-origin-on-hover" class="navlink w-inline-block">
+                    <div>SignUp</div>
+                    <div data-ix="move-left-100-percent" class="hover-line"></div>
+                </a>
+                {% endif %}
+            </nav>
+            <div class="menu-button w-nav-button">
+                <div class="burger-menu w-icon-nav-menu"></div>
+            </div>
+        </div>
     </div>
-  </div>
+    <div class="d1">
+        <div class="white">
+            <h1 style="color: white;">Hello</h1>
 
-  <div class="d1">
-    <div class="white">
-      <h1 style="color: white;">Tell us what you need done</h1>
-      <p style="color: white; font-size: 20px;">
-        Contact skilled experts within minutes. View profiles, ratings, portfolios and chat with them.
-        Pay the Experts only when you are 100% satisfied with their work.
-      </p>
+
+            <h1 style="color: white;">Tell us what you need done
+                <br>
+            </h1>
+            <p style="color: white; font-size: 20px;">
+                Contact skilled experts within minutes. View profiles, ratings, portfolios and chat with them. 
+                Pay the Experts only when you are 100% satisfied with their work.</p>
+        </div>
+
+
+        <div class="d2">
+            {% if post_project %}
+                <form method="post" action="{% url 'Portal:post_project' %}">
+            {% else %}
+                <form method="post">
+            {% endif %}
+                {% csrf_token %}
+                <label for="name">
+                    <h3 style="color: black; font-weight:normal">Choose a name for your project</h3>
+                </label>
+                <input class="in" type="text" id="name" name="name" value="{{name}}" placeholder="e.g. Build me a website" required tabindex="1"
+                    autofocus/>
+                <br>
+                <br>
+
+                <label for="message">
+                    <h3 style="color: black; font-weight:normal">Tell us more about your project</h3>
+                    <p style="font-size:15px;color: black; font-weight:normal">Start with a bit about yourself or your business, and include an overview of what you need done.</p>
+                </label>
+                <br>
+                <textarea class="txt" id="message" name="desc" placeholder="Describe your project here." tabindex="5" required>{{desc}}</textarea>
+                <br>
+                <br>
+
+
+                <label for="date">
+                    <h3 style="color: black; font-weight:normal">When do you want it to be done?</h3>
+                </label>
+                <input class="ddl" style="color: black; font-weight:normal" type="date" id="date" name="deadline" value='{{deadline}}' required>
+                <br>
+                <br>
+                <input type="submit" value="Post" />
+            </form>
+        </div>
     </div>
 
-    <div class="d2">
-      {% if post_project %}
-      <form method="post" action="{% url 'Portal:post_project' %}" enctype="multipart/form-data">
-      {% else %}
-      <form method="post" enctype="multipart/form-data">
-      {% endif %}
-        {% csrf_token %}
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" type="text/javascript" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script src="https://daks2k3a4ib2z.cloudfront.net/5862ff0a48ddaea33e96e0ef/js/webflow.299fdfef2.js" type="text/javascript"></script>
 
-        <label for="name">Project Name</label>
-        <input type="text" id="name" name="name" value="{{name}}" placeholder="e.g. Build me a website" required autofocus />
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js" type="text/javascript"></script>
 
-        <label for="desc">Project Description</label>
-        <textarea id="desc" name="desc" placeholder="Describe your project here." required>{{desc}}</textarea>
+    <script type="text/javascript">
+        WebFont.load({ google: { families: ["Open Sans:300,300italic,400,400italic,600,600italic,700,700italic,800,800italic", "Montserrat:100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic"] } });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js" type="text/javascript"></script>
 
-        <label for="deadline">Deadline</label>
-        <input type="date" id="deadline" name="deadline" value="{{deadline}}" required />
+    <script type="text/javascript">
 
-        <label for="budget">Budget (in USD)</label>
-        <input type="number" id="budget" name="budget" placeholder="Enter budget amount" min="1" step="0.01" required />
+        var today = new Date();
 
-        <label for="attachment">Upload Files/Attachments</label>
-        <input type="file" id="attachment" name="attachment" multiple />
+        document.getElementById("date").min = today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + today.getDate()).slice(-2);
 
-        <input type="submit" value="Post Project" />
-      </form>
-    </div>
-  </div>
-
-  <!-- Scripts -->
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js"
-    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="https://daks2k3a4ib2z.cloudfront.net/5862ff0a48ddaea33e96e0ef/js/webflow.299fdfef2.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js"></script>
-  <script>
-    WebFont.load({
-      google: {
-        families: [
-          "Open Sans:300,400,600,700",
-          "Montserrat:400,500,600,700"
-        ]
-      }
-    });
-
-    // Set minimum date to today
-    const today = new Date();
-    const minDate = today.toISOString().split("T")[0];
-    document.getElementById("deadline").min = minDate;
-
-    (function (o, c) {
-      var n = c.documentElement, t = " w-mod-";
-      n.className += t + "js";
-      ("ontouchstart" in o || (o.DocumentTouch && c instanceof DocumentTouch)) && (n.className += t + "touch");
-    })(window, document);
-  </script>
+        !function (o, c) {
+            var n = c.documentElement, t = " w-mod-"; n.className += t + "js", ("ontouchstart" in o || o.DocumentTouch && c instanceof DocumentTouch) && (n.className += t + "touch")
+        }(window, document);
+    </script>
 </body>
 
 </html>

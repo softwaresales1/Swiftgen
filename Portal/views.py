@@ -1012,16 +1012,3 @@ def task_editfunction(request, project_id, task_id):
         context['date'] = date
         return render(request,'edittask.html',context)
     return redirect("Portal:task_description", project_id, task_id)
-
-from django import forms
-from .models import Project
-
-class ProjectForm(forms.ModelForm):
-    class Meta:
-        model = Project
-        fields = ['name', 'desc', 'deadline', 'budget', 'attachment']
-        widgets = {
-            'deadline': forms.DateInput(attrs={'type': 'date'}),
-        }
-
-
